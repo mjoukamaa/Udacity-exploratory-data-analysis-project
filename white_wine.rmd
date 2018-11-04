@@ -1,0 +1,559 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+White wine properties and quality by M. Joukamaa
+========================================================
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages}
+library(ggplot2)
+library(gridExtra)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Load_the_Data}
+df <- read.csv('wineQualityWhites.csv')
+
+# since the quality ratings given by the wine-tasting experts are discrete
+# values on 0-10 scale, I am making a factored version of that variable in 
+# order to facilitiate the use of the ratings in the analysis of the data.
+df$quality.factored <- factor(df$quality)
+```
+
+In this report I am examining a dataset on white wine samples. The dataset
+contains measurements about several chemical and physical qualities of the
+samples as well as ratings given to them by wine-tasting experts.
+
+# Univariate Plots Section
+
+As a first step of the examination, I am creating univariate plots and numerical summaries of all the different variables present in the data. In these initial examinations I am considering  mostly the values from the lowest one of each
+variable up to the 0.75 quantile of the value range. The reason for this is that
+even the most cursory overview of the histograms and the value summaries below
+shows that the maximum values are not particularly representative of the
+distributions in most of the cases.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Univariate_Plots_fixed_acidity}
+qplot(x = df$fixed.acidity, binwidth = 0.2)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Summaries_fixed_acidity}
+summary(df$fixed.acidity)
+```
+
+Fixed acidity ranges in 75 % of the samples from 3.8 grams per cubic decimetre
+to 7.3 grams per cubic decimetre with a median of 6.8 grams per cubic decimetre.
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Univariate_Plots_vol_acidity}
+qplot(x = df$volatile.acidity, binwidth = 0.02)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Summaries_vol_acidity}
+summary(df$volatile.acidity)
+```
+
+Volatile acidity ranges from 0.08 grams per cubic decimeter to 0.32 grams per
+cubic decimeter for 75 % of the samples with a median of 0.26 grams per cubic
+decimetre.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Univariate_Plots_citric_acid}
+qplot(x = df$citric.acid, binwidth = 0.02)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Summaries_citric_acid}
+summary(df$citric.acid)
+```
+
+Citric acid concentrations range in 75 % of the samples from round zero to
+0.39 grams per cubic decimetre with a median of 0.32 grams per cubic decimetre.
+There is also a noticeable spike of samples for citric acid concentrations of
+slightly below 0.5 grams per cubic decimetre.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Univariate_Plots_res_sugar}
+qplot(x = df$residual.sugar, binwidth = 1)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Summaries_res_sugar}
+summary(df$residual.sugar)
+```
+
+The quantities of residual sugar in the samples range from 0.6 grams per cubic
+decimetre to 9.9 grams per cubic decimetre for 75 % of them with a median of 5.2
+grams per cubic decimetre. Compared to the previous chemical and physical sample properties plotted, the distribution skews more notably to the right and is
+especially concentrated on the lower end of the values.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Univariate_Plots_chlorides}
+qplot(x = df$chlorides, binwidth = 0.005)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Summaries_chlorides}
+summary(df$chlorides)
+```
+
+The amount of chlorides (essentially, salt) present ranges from 0.009 grams per
+cubic decimeter to 0.05 grams per cubic decimeter for 75 % of the samples with a
+median of 0.043 grams per cubic decimetre.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Univariate_Plots_free_SO2}
+qplot(x = df$free.sulfur.dioxide, binwidth = 5)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Summaries_free_SO2}
+summary(df$free.sulfur.dioxide)
+```
+
+The amount of free sulfur dioxide present ranges from 2 milligrams per cubic
+decimetre to 46 milligrams per cubic decimetre for 75 % of the samples with a
+median of 34 milligrams per cubic decimetre.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Univariate_Plots_total_SO2}
+qplot(x = df$total.sulfur.dioxide, binwidth = 10)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Summaries_total_SO2}
+summary(df$total.sulfur.dioxide)
+```
+
+The total amount of sulfur dioxide has a much wider range with the amount
+varying between 9 milligrams per cubic decimetre and 167 milligrams per cubic
+decimetre for 75 % of the samples with a median of 134 milligrams per cubic
+decimetre.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Univariate_Plots_density}
+qplot(x = df$density, binwidth = 0.001)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Summaries_density}
+summary(df$density)
+```
+
+The density for most of the wine samples falls in a rather narrow range just
+very slightly below 1 (that is, the density of water). This is understandable
+given that wine contains ethanol, which has a density of only 0.789.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Univariate_Plots_pH}
+qplot(x = df$pH, binwidth = 0.02)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Summaries_pH}
+summary(df$pH)
+```
+
+For pH the range is also rather narrow one, varying from 2.72 to 3.28 for 75 %
+of the samples with a median of 3.18. Of course, since the pH scale is
+logarithmic, even these small differences can mean rather large and noticeable differences in the actual taste of the wine samples.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Univariate_Plots_sulphates}
+qplot(x = df$sulphates, binwidth = 0.02)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Summaries_sulphates}
+summary(df$sulphates)
+```
+
+Sulphates present in the samples range from 0.22 grams per cubic decimetre to
+0.55 grams per cubic decimetre for 75 % of the samples with a median of 0.47
+grams per cubic decimetre.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Univariate_Plots_alcohol}
+qplot(x = df$alcohol, binwidth = 0.2)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Summaries_alcohol}
+summary(df$alcohol)
+```
+
+The proportion of alcohol (ethanol, to be precise) in the samples ranges from
+8 % to 14.2 % of the sample volume with a median of 10.4 %. The histogram for
+the variable shows that the distribution is somewhat right-tailed one, with a particularly large number of samples being in the 9.0 - 9.5 % alcohol volume
+range. On the other hand, the alcohol content distribution doesn't have any real outliers, unlike the previous variables considered.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Univariate_Plots_quality}
+qplot(x = df$quality.factored)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Summaries_quality}
+summary(df$quality.factored)
+```
+
+Finally, there is the histogram and value summary for the wine quality samples
+as judged by at least three wine-tasting experts. While the full rating scale
+for quality is from 0 to 10, in the current dataset no sample gets a rating
+lower than 3 or higher than 9. Majority of the ratings are concentrated in the
+5-7 middle value range.
+
+# Univariate Analysis
+
+So, the dataset consists of 4898 observations of 13 different variables. Twelve
+of these variables are actual measurements made on the various chemical/physical
+qualities of the wine samples. The final variable is a rating on a 0-10 scale
+given to the wine sample by at least three wine experts. As the expert rating
+attempts to quantify the overall 'goodness' of a wine sample, this metric can be considered to be the response/dependent variable in relation to the chemical/
+physical qualities. Also, while it is impossible for the expert ratings to
+affect the measured qualities in any way, the measured qualities most probably
+affect the expert ratings in some manner.
+
+As the histograms above show, most of the chemical/physical qualities of the
+wine samples tend to have a roughly normal distribution across the different
+samples. However, the plots also show that pretty much all of the distributions
+have more or less right-skewing tails. Related to this, it is also worth noting
+that as the numerical summaries clearly show, the maximum values for almost all
+of the above distributions are markedly larger than the upper bound of 0.75
+quantile, which indicates that there are outliers present in the distributions.
+
+There are also two variables which have distributions that don't really conform
+to the properties of a normal distribution. As noted before, the amount of
+residual sugar in the samples is heavily concentrated in the lowest levels of
+the value range. Another variable that doesn't quite fit the normal distribution
+mold is the alcohol content of the samples which is also somewhat concentrated
+on the low end of the value range, though not as dramatically as the residual
+sugar levels. I will apply some additional attention on these two variables in
+the next section to make some more sense of these distributions.
+
+The data seems tidy enough as it is, so any transformations or other operations
+to tidy it up don't seem necessary. However, I did make a factor version of the
+expert rating variable to be used alongside the original variable in those 
+situations and examinations where it is necessary to use a factor-scale
+variable.
+
+# Bivariate Plots Section
+
+Based on the considerations lined out above, the main question of interest
+concerning the dataset is whether an association can be found between the chemical/physical qualities of a wine sample and the rating given to it by the wine-tasting experts. To investigate that question, I start by making boxplots
+of all the said qualities grouped by the expert ratings as well as calculating
+Pearson's correlation coefficients for these qualities in relation to the 
+ratings.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_Plots_fixed_acidity}
+ggplot(aes(x = quality.factored, y = fixed.acidity), data = df) +
+  geom_boxplot(aes(group = quality))
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Correlations_fixed_acidity}
+cor.test(df$quality, df$fixed.acidity)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_Plots_vol_acidity}
+ggplot(aes(x = quality, y = volatile.acidity), data = df) +
+  geom_boxplot(aes(group = quality))
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Correlations_vol_acidity}
+cor.test(df$quality, df$volatile.acidity)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_Plots_citric_acid}
+ggplot(aes(x = quality, y = citric.acid), data = df) +
+  geom_boxplot(aes(group = quality))
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Correlations_citric_acid}
+cor.test(df$quality, df$citric.acid)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_Plots_res_sugar}
+ggplot(aes(x = quality, y = residual.sugar), data = df) +
+  geom_boxplot(aes(group = quality))
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Correlations_res_sugar}
+cor.test(df$quality, df$residual.sugar)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_Plots_chlorides}
+ggplot(aes(x = quality, y = chlorides), data = df) +
+  geom_boxplot(aes(group = quality))
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Correlations_chlorides}
+cor.test(df$quality, df$chlorides)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_Plots_free_SO2}
+ggplot(aes(x = quality, y = free.sulfur.dioxide), data = df) +
+  geom_boxplot(aes(group = quality))
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Correlations_free_SO2}
+cor.test(df$quality, df$free.sulfur.dioxide)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_Plots_total_SO2}
+ggplot(aes(x = quality, y = total.sulfur.dioxide), data = df) +
+  geom_boxplot(aes(group = quality))
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Correlations_total_SO2}
+cor.test(df$quality, df$total.sulfur.dioxide)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_Plots_density}
+ggplot(aes(x = quality, y = density), data = df) +
+  geom_boxplot(aes(group = quality))
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Correlations_density}
+cor.test(df$quality, df$density)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_Plots_pH}
+ggplot(aes(x = quality, y = pH), data = df) +
+  geom_boxplot(aes(group = quality))
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Correlations_pH}
+cor.test(df$quality, df$pH)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_Plots_sulphates}
+ggplot(aes(x = quality, y = sulphates), data = df) +
+  geom_boxplot(aes(group = quality))
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Correlations_sulphates}
+cor.test(df$quality, df$sulphates)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_Plots_alcohol}
+ggplot(aes(x = quality, y = alcohol), data = df) +
+  geom_boxplot(aes(group = quality))
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Correlations_alcohol}
+cor.test(df$quality, df$alcohol)
+```
+
+I am also examining if there are observeable associations between some of the
+other variables of the dataset as well. I am first taking a look at the
+relationship between the alcohol content of a wine sample and the amount of
+residual sugar present in it. As the sugar of the grapes tranforms into ethanol
+during the fermentation process of the wine, my initial assumption would be that
+those wine samples with a higher alcohol content would have less residual sugar
+present in them.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_alcohol_res_sugar}
+ggplot(aes(x = alcohol, y = residual.sugar), data = df) +
+  geom_point(alpha = 0.05, position = 'jitter')
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Correlations_alcohol_res_sugar}
+cor.test(df$alcohol, df$residual.sugar)
+```
+
+I am also interested to see if those samples with a higher alcohol content have
+a lower density than those with less alcohol in them, as the density of ethanol
+is less than that of water.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Bivariate_alcohol_density}
+ggplot(aes(x = alcohol, y = density), data = df) +
+  geom_point(alpha = 0.1, position = 'jitter')
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Correlations_alcohol_density}
+cor.test(df$alcohol, df$density)
+```
+
+# Bivariate Analysis
+
+For most of the chemical/physical qualities of the wine samples there doesn't
+seem to be any particularly noteworthy variation when they are examined across
+the expert ratings. The value ranges for most of the variables are rather
+narrow to begin with, and especially when looking at the median values, the 
+variation doesn't seem to exhibit discernible patterns for most of the
+variables. Also, most of the coefficients calculated for correlations between
+the quality ratings and other variables are not particularly strong.
+
+However, a few of the chemical/physical qualities of the samples exhibit an
+association with the expert ratings that are clear and consistent enough to
+warrant further examination. In terms of the correlation coefficients, the
+strongest associations that the expert ratings have are with alcohol content
+(r = 0.44), density (r = -0.31), chlorides (r = -0.21), volatile acidity
+(r = -0.19), and total amount of sulfur dioxide (r = -0.17).
+
+When looking at the boxplots of these variables by the levels of expert ratings,
+they mostly show similar relationships and trends as indicated by the
+correlation coefficients. However, it is worth noting that the boxplots for
+chloride and volatile acidity levels show numerous instances of outliers in the
+distributions of these variables. This factor calls for prudence in further
+analyses concerning these two variables.
+
+With regards to the density of the samples, the scatter plot of sample density
+vs. alcohol content which ends the previous section shows a clear (and linear)
+relationship between these two variables. This is also affirmed by the strong
+correlation coefficient (r = -0.78) of the variables. Thus, the density of
+the samples can be considered to be mostly a function of their alcohol content
+and should be dropped from further investigations as a superfluous and possibly
+confounding variable.
+
+However, given that the alcohol content of the samples affects their density in
+observeable amounts, the couple of outliers that have a density above that of
+water invite some interesting speculation. Could it be that the samples in
+question have also some foreign substances present in them that increase their
+density to a marked degree?
+
+Finally, the plot of residual sugar vs. alcohol content presents a more complex relationship. While in general terms the samples with higher alcohol levels tend
+to have lower amounts of residual sugar, there are also samples with low levels
+of both alcohol and residual sugar. So while there are wine samples where the fermentation process has not processed all of the sugar into ethanol, there are
+probably also grape strains with lower levels of sugar to begin with - and thus
+also low levels of alcohol in the end product as well.
+
+# Multivariate Plots Section
+
+In the previous section four variables were identified which exhibited
+noteworthy relationships with the quality ratings of the samples: alcohol
+content, total amount of sulfur dioxide, volatile acidity and chloride levels of
+the samples. Next, I am making several scatter plots to see if the pairwise
+plotting of these chemical/physical qualities grouped by the expert rating
+levels shows any clear trivariate relationships between these variables.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Multivariate_Plots_volatile_acidity_vs_chlorides}
+ggplot(aes(x = volatile.acidity, y = chlorides), data = df) +
+  geom_point(aes(color = quality.factored), alpha = 0.3, position = 'jitter') +
+  scale_color_brewer(type = 'div', direction = -1)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Multivariate_Plots_volatile_acidity_vs_total_SO2}
+ggplot(aes(x = volatile.acidity, y = total.sulfur.dioxide), data = df) +
+  geom_point(aes(color = quality.factored), alpha = 0.3, position = 'jitter') +
+  scale_color_brewer(type = 'div', direction = -1)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,  Multivariate_Plots_alcohol_vs_chlorides}
+ggplot(aes(x = alcohol, y = chlorides), data = df) +
+  geom_point(aes(color = quality.factored), alpha = 0.3, position = 'jitter') +
+  scale_color_brewer(type = 'div', direction = -1)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Multivariate_Plots_alcohol_vs_volatile_acidity}
+ggplot(aes(x = alcohol, y = volatile.acidity), data = df) +
+  geom_point(aes(color = quality.factored), alpha = 0.3, position = 'jitter') +
+  scale_color_brewer(type = 'div', direction = -1)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE,     Multivariate_Plots_total_SO2_vs_chlorides}
+ggplot(aes(x = total.sulfur.dioxide, y = chlorides), data = df) +
+  geom_point(aes(color = quality.factored), alpha = 0.3, position = 'jitter') +
+  scale_color_brewer(type = 'div', direction = -1)
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, Multivariate_Plots_alcohol_vs_total_sulfur_dioxide}
+ggplot(aes(x = alcohol, y = total.sulfur.dioxide), data = df) +
+  geom_point(aes(color = quality.factored), alpha = 0.3, position = 'jitter') +
+  scale_color_brewer(type = 'div', direction = -1)
+```
+
+# Multivariate Analysis
+
+Most of the scatter plots I made above don't really present any discernible
+patterns of trivariate relationships between the two variables plotted and the
+grouping made by expert ratings. While in some of the plots the best-rated wines
+are clearly concentrated in a certain end of one of the axes, the expert ratings
+tend to be all over the place in terms of the other plotted variable. The
+numerous outliers present in the volatile acidity and chloride distributions
+that were noted previously account undoubtedly for a lot of this noise. Still,
+the lack of discernible patterns in most of the above plots doesn't probably
+return exclusively to the effect of the outliers.
+
+However, the scatter plot of total sulfur dioxide amount versus alcohol content
+seems to show a clear and discernible relationship between the three different
+variables examined. The best-rated wines are concentrated mostly not only in the
+high end of the alcohol volume scale but also in the lower ratings of total
+sulfur dioxide amount. Thus, according to these results, in order for a wine to
+achieve a good expert rating it needs to have a relatively high alcohol volume,
+but the amount of sulfur dioxide in it should also be rather low.
+
+------
+
+# Final Plots and Summary
+
+### Plot One
+```{r echo=FALSE, message=FALSE, warning=FALSE, Plot_One}
+ggplot(aes(x = quality.factored, y = alcohol), data = df) +
+  geom_boxplot(aes(group = quality.factored), fill = '#DDEEEE') +
+  labs(x = 'Quality rating (0-10)', y = 'Alcohol (vol. %)',
+       title = 'Alcohol content by expert quality ratings') +
+  theme_light()
+```
+
+### Description One
+The plot above shows a strong and clear relationship between the alcohol
+content of the wine samples and expert ratings given to them. This relationship
+is not entirely straightforward, though. As can be seen in the plot, there is a
+slight upward trend in the alcohol content of the samples toward the lower range
+of the ratings scale as well. But in general it can be said that wine samples
+with higher alcohol content tend to also get higher expert ratings.
+
+### Plot Two
+```{r echo=FALSE, message=FALSE, warning=FALSE, Plot_Two}
+ggplot(aes(x = quality.factored, y = total.sulfur.dioxide), data = df) +
+  geom_boxplot(aes(group = quality.factored), fill = '#DDEEEE') +
+    labs(x = 'Quality rating (0-10)', y = 'Total sulfur dioxide (mg/dm³)',
+         title = 'Total sulfur dioxide by expert quality ratings') +
+  theme_light()
+```
+
+### Description Two
+This second plot show that for the total amount of sulfur dioxide in the samples
+the higher ratings are associated with a downward trend for the sulfur dioxide.
+Even though there can be seen some slight fluctuation in the plot, the overall
+trend is quite clear.
+
+### Plot Three
+```{r echo=FALSE, message=FALSE, warning=FALSE, Plot_Three}
+ggplot(aes(x = alcohol, y = total.sulfur.dioxide), data = df) +
+  geom_point(aes(color = quality.factored), alpha = 0.3, position = 'jitter') +
+  scale_y_sqrt() +
+  scale_color_brewer(type = 'div', direction = -1) +
+  labs(color = 'Quality rating', x = 'Alcohol (vol. %)',
+       y = 'Total sulfur dioxide (mg/dm³), square root scale',
+       title = 'Alcohol content vs. total sulfur dioxide',
+       subtitle = 'Grouped by expert quality ratings') +
+  theme_light()
+```
+
+### Description Three
+Combining the previous two examinations, the above plot shows how the color
+gradient for expert ratings moves quite clearly along both axes of the plot.
+Thus the best-rated wines are mostly in the high end of the alcohol content
+scale and low end of the sulfur dioxide amount scale with both of the variables
+having a roughly linear relationship with the expert ratings. When appraising
+the plot, it should be noted that the y-axis of the plot has been transformed
+into a square root scale in order to make the plot clearer and more readable.
+
+------
+
+# Reflection
+
+In this report I set out to examine a dataset of 4898 wine samples with 13 
+different variables measuring the chemical and physical qualities of the samples
+as well as rating them on their overall quality. I looked over the distributions
+of the individual variables and then focused more closely on how the different
+chemical and physical qualities were associated with quality ratings of the
+samples. In the end, I found a rather clear and straightforward three-way
+relationship between the sample ratings, their alcohol content and the total
+amount of sulfur dioxide in them.
+
+It was somewhat sobering (pun intended) to see how strongly the alcohol content
+was correlated with the ratings given to the samples by wine-tasting experts, as
+even these experts seem to mostly favor strong wines over lighter ones. While
+some of the other objective properties of the wine samples were also associated
+with the expert rating levels to some degree, the negative relationship with the
+total amount of sulfur dioxide provided a particularly distinguishable fit when
+coupled with the alcohol content.
+
+The examination of the dataset was mostly a rather straightforward job, though
+of course time-consuming in nature. Probably the most vexing part of the
+examination was figuring out which of the bivariate relationships were
+significant enough to warrant further investigation. Stylistical considerations
+for the three summary plots necessitated also several trial-and-error iterations
+before arriving to their final designs.
+
+While further analyses about the relationships between the different chemical
+and physical properties of the samples can always be made, more fruitful work on
+the samples would probably benefit from additional data. For example, 
+information about grape strains used or fermentation times and conditions could
+probably provide all kinds of interesting insights when combined with the 
+current data. Another possible avenue of investigation would be to look at the
+prices of the different wines and how much they correlate on one hand with the
+expert ratings, and on the other hand with the most significant chemical and
+physical properties of the samples.
